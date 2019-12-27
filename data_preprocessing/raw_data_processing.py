@@ -23,7 +23,7 @@ CHARACTER_ENCODING_MAPPINGS = {}  # stores the mappings between raw observation 
 RAW_RUNNING_LOGS = []  # list for storing un-processed running logs.
 
 MAX_COLUMN_SIZE = 0  # maximum number of columns for processed observation of logs.
-OBSERVATION_LENGTH = 100  # the maximum length of the observation of logs in training data.
+OBSERVATION_LENGTH = 50  # the maximum length of the observation of logs in training data.
 SIZE_OF_EACH_LOG_TYPE = []
 
 GENERATED_LOGS_LOC = '../dataset'  # location to save the processed running logs
@@ -33,16 +33,15 @@ DEFAULT_GENERATED_LOG_FILE_NAME = ''
 def load_data(filename, raw_data_path=DEFAULT_RAW_DATA_PATH):
     """Loads raw running logs. Fill contents to the global parameters.
 
+    :type filename: str
+    :type raw_data_path: str
+
     Arguments
     ---
     filename: str
         filename of the file containing running logs.
     raw_data_path: str
         the path of the logs located.
-
-    Returns
-    ---
-
     """
 
     global DEFAULT_GENERATED_LOG_FILE_NAME
@@ -66,7 +65,7 @@ def load_data(filename, raw_data_path=DEFAULT_RAW_DATA_PATH):
             character_freq_dict[e] = 0
 
         global RAW_RUNNING_LOGS
-        # initialize the RAW_RUNNING_LOGS dict
+        # initialize the RAW_RUNNING_LOGS list
         log_types = len(SIZE_OF_EACH_LOG_TYPE)
         for _ in range(log_types):
             RAW_RUNNING_LOGS.append([])
@@ -149,7 +148,7 @@ def encode_and_save_logs(filename='processed_logs'):
 
     filename = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '_' + \
                DEFAULT_GENERATED_LOG_FILE_NAME + '_' + filename
-    # fixme: batch processing, memory overflow issue
+    # TODO: batch processing or more elegant approach, memory overflow issue
     # batch processing may needed when running logs data is too big to process in one time.
     log_size = len(RAW_RUNNING_LOGS)
     if log_size > 300_000:
@@ -165,7 +164,7 @@ def encode_and_save_logs(filename='processed_logs'):
                 batched_logs_list.append(transform_observation(RAW_RUNNING_LOGS[i]))
             start, end = end + 1, min(end + batch_size, log_size)
 
-            # save current batched running logs to local file is recommended.
+            # saving current batched running logs to local file is recommended.
             save_as_npz(batched_logs_list, filename + '_ep' + str(ep))
             del batched_logs_list
     else:
@@ -178,6 +177,8 @@ def encode_and_save_logs(filename='processed_logs'):
 
 def transform_observation(log):
     """helper function for encode()
+
+    :type log: list
 
     Arguments
         log: A running log <list> type contains observation, label
@@ -237,8 +238,12 @@ def save_as_npz(logs, filename):
 
 # Driver the program to test the method above.
 if __name__ == '__main__':
+    # NOTICE: Check OBSERVATION_LENGTH before launch the program.
+
     # load_data('2019-12-23 18:33:31_czgxOmZzODphczIwOmZlczQ=_running-logs.txt')
-    load_data('2019-12-24 21:33:29_czEwMjpmczEwOmFzMTc6ZmVzNA==_running-logs.txt')
+    # load_data('2019-12-24 21:33:29_czEwMjpmczEwOmFzMTc6ZmVzNA==_running-logs.txt')
+    # load_data('2019-12-23 18:34:59_czY3OmZzNjphczE2OmZlczM=_running-logs.txt')
+    load_data('2019-12-28 00:41:55_czc1OmZzNzphczE1OmZlczQ=_running-logs.txt')
     print('Filled configurations: ')
     print('max column size:', MAX_COLUMN_SIZE)
     print('size of each log type: ', SIZE_OF_EACH_LOG_TYPE)

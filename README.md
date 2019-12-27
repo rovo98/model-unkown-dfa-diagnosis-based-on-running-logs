@@ -18,6 +18,16 @@ RNNs and LSTM may does better than CNNs for this classification task.
 
 参考: [https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/](https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/)
 
+当前尝试方案:
+
+刚开始尝试使用产生的数据量较大，编译的模型非常复杂，训练时间非常长（先放弃尝试了）
+
+> 折中方案：选择随机状态大小为 50 ～ 100， 随机生成的日志长度限制为 30 ～ 50， 则预处理编码后产生的矩阵表示为 [1, 50 x (observable_event_set_size + 1)\]
+> 产生的日志，经处理后，只剩 3 万多条，用于训练模型。训练时间大概为几分钟。
+
+![1dcovnet_training_example_01](./images/1dcovnet_training_test_01.png)
+![1dcovnet_training_example_02](./images/1dcovnet_training_test_02.png)
+
 ### 3. RNNs
 
 ### 4. LSTM

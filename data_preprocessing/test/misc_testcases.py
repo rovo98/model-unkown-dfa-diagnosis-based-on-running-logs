@@ -1,6 +1,5 @@
 import unittest
 
-
 RAW_DATA_LOC = '../../../generated-logs'
 
 
@@ -42,6 +41,37 @@ class MyTestCase(unittest.TestCase):
         print(result)
         self.assertIsNotNone(result)
         self.assertTrue(len(result) == 5_000)
+
+    def test_save_and_load_using_pickle(self):
+        test_dict = {'a': [1, 0, 0, 1], 'b': [1, 1]}
+        test_int = 100
+        from utils.load_and_save import save_object
+        from utils.load_and_save import load_object
+        save_object('./test_config', [test_dict, test_int])
+
+        loaded_list = load_object('./test_config')
+        self.assertIsNotNone(loaded_list)
+        self.assertEquals(loaded_list[1], test_int)
+        print(loaded_list[0], loaded_list[1])
+        print(type(loaded_list[0]), type(loaded_list[1]))
+
+    def test_encoding_new_log(self):
+        test_logs = ['vlwkkpqwdwlT4', 'ksvnbwxxwblbpnnklkbpwllxdwpkbddddlknkwpkbddddlT2',
+                     'kdqsvblsxblsvnwkkT4', 'vlvnkswwslwwT1',
+                     'vldsplwllxllvqnqkkkklkxT3', 'kslsxbkkwsvxsdssddkbspxkswpbwxxT0',
+                     'vldsxvslddvslbbvwblT2']
+
+        import utils.log_encoding as log_encoding
+        log_encoding.load_config('2019-12-28 16:43:36_czc1OmZzNzphczE1OmZlczQ=_config')
+        encoded_logs = []
+        for rl in test_logs:
+            features, label = log_encoding.encode_log(rl, num_of_faulty_type=5)
+            encoded_logs.append([features, label])
+
+        self.assertTrue(len(encoded_logs) == len(test_logs))
+        # print(encoded_logs)
+        for el in encoded_logs:
+            print(el[0], len(el[0]), el[1])
 
 
 if __name__ == '__main__':

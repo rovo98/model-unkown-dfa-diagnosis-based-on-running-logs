@@ -13,7 +13,7 @@ from scipy.sparse import csr_matrix
 from tqdm import tqdm
 
 from utils.imbalanced_preprocessing import under_sampling, over_sampling
-from utils.load_and_save_sparse_matrix import save_sparse_csr
+from utils.load_and_save import save_sparse_csr
 
 DEFAULT_RAW_DATA_PATH = '../../generated-logs'
 
@@ -28,6 +28,8 @@ SIZE_OF_EACH_LOG_TYPE = []
 
 GENERATED_LOGS_LOC = '../dataset'  # location to save the processed running logs
 DEFAULT_GENERATED_LOG_FILE_NAME = ''
+
+GENERATED_ENCODING_CONFIG_LOC = '../encoding-configs'  # location to save configurations for encoding logs.
 
 
 def load_data(filename, raw_data_path=DEFAULT_RAW_DATA_PATH):
@@ -122,6 +124,9 @@ def load_data(filename, raw_data_path=DEFAULT_RAW_DATA_PATH):
         MAX_COLUMN_SIZE = len(CHARACTER_ENCODING_MAPPINGS
                               .get(CHARACTER_FREQ_LIST[-1][0])) * OBSERVATION_LENGTH
 
+        # TODO: persistence operation is needed, saving CHARACTER_ENCODING_MAPPINGS
+        #  and MAX_COLUMN_SIZE to a config file.
+
         print('>>> done!\n')
 
 
@@ -148,7 +153,7 @@ def encode_and_save_logs(filename='processed_logs'):
 
     filename = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '_' + \
                DEFAULT_GENERATED_LOG_FILE_NAME + '_' + filename
-    # TODO: batch processing or more elegant approach, memory overflow issue
+    # TODO: batch processing or more elegant approach is needed, memory overflow issue
     # batch processing may needed when running logs data is too big to process in one time.
     log_size = len(RAW_RUNNING_LOGS)
     if log_size > 300_000:
@@ -181,7 +186,8 @@ def transform_observation(log):
     :type log: list
 
     Arguments
-        log: A running log <list> type contains observation, label
+        log: A running log <list> type contains observation, label, structure like
+            [observation, label]
 
     Returns
         A encoded running log. <list> and the last element is the label of the log.
@@ -236,8 +242,33 @@ def save_as_npz(logs, filename):
     print('>>> logs saved to {}'.format(path))
 
 
+def save_encoding_config(filename='config'):
+    """Saving configurations for encoding raw logs.
+
+    :type filename: str
+
+    Args
+        filename: name of the file to save configuration of current dataset.
+
+    Returns
+        None
+    """
+    from utils.load_and_save import save_object
+    filename = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '_' + \
+               DEFAULT_GENERATED_LOG_FILE_NAME + '_' + filename
+    path = GENERATED_ENCODING_CONFIG_LOC + os.sep + filename
+
+    # creates target folder if it not existed.
+    if not os.path.exists(GENERATED_ENCODING_CONFIG_LOC):
+        os.mkdir(GENERATED_ENCODING_CONFIG_LOC)
+
+    save_object(path, [CHARACTER_ENCODING_MAPPINGS, MAX_COLUMN_SIZE])
+    print('> Encoding configuration saved to {} successfully.'.format(path))
+
+
 # Driver the program to test the method above.
 if __name__ == '__main__':
+    # REMARKS: checking all configuration before launch the program.
     # NOTICE: Check OBSERVATION_LENGTH before launch the program.
 
     # load_data('2019-12-23 18:33:31_czgxOmZzODphczIwOmZlczQ=_running-logs.txt')
@@ -248,5 +279,7 @@ if __name__ == '__main__':
     print('max column size:', MAX_COLUMN_SIZE)
     print('size of each log type: ', SIZE_OF_EACH_LOG_TYPE)
     encode_and_save_logs()
+    # save configuration of current processed running logs.
+    save_encoding_config()
     # print(RAW_RUNNING_LOGS)
     # print(len(RAW_RUNNING_LOGS))

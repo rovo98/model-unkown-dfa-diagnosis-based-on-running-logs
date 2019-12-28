@@ -1,12 +1,30 @@
 import unittest
 
 import os
-from utils.load_and_save_sparse_matrix import load_sparse_csr
+from utils.load_and_save import load_sparse_csr
 
 GENERATED_LOGS_LOC = '../../dataset'
 
 
 class MyTestCase(unittest.TestCase):
+    def test_loading_raw_logs(self):
+        import raw_data_processing as rdp
+
+        rdp.load_data('2019-12-23 18:33:31_czgxOmZzODphczIwOmZlczQ=_running-logs.txt',
+                      '../../../generated-logs')
+
+        print('Filled configurations: ')
+        print('max column size:', rdp.MAX_COLUMN_SIZE)
+        print('size of each log type: ', rdp.SIZE_OF_EACH_LOG_TYPE)
+
+        self.assertTrue(len(rdp.CHARACTER_FREQ_LIST) > 0)
+        print('character frequency list:')
+        print(rdp.CHARACTER_FREQ_LIST)
+
+        self.assertTrue(len(rdp.CHARACTER_ENCODING_MAPPINGS) > 0)
+        print('character encoding mapping:')
+        print(rdp.CHARACTER_ENCODING_MAPPINGS)
+
     def test_loading_encoded_logs(self):
         path = GENERATED_LOGS_LOC + os.sep
         # path = path + '2019-12-26 20:31:36_czgxOmZzODphczIwOmZlczQ=_processed_logs.npz'
@@ -29,7 +47,7 @@ class MyTestCase(unittest.TestCase):
         size = len(train_data)
         print('size: {}'.format(size))
 
-        print(train_data.reshape(1, size*1400).reshape(1, size, 1400)[0])
+        print(train_data.reshape(1, size * 1400).reshape(1, size, 1400)[0])
         print(train_data.reshape(size, 1, 1400).shape)
         print(train_data.reshape(size, 1400, 1).shape)
         print(train_data.shape)
@@ -44,6 +62,12 @@ class MyTestCase(unittest.TestCase):
         print(x_train, y_train)
         print(len(x_train), len(y_train))
         print(len(x_test), len(y_test))
+        np.random.seed(200)
+        np.random.shuffle(x_train)
+        np.random.seed(200)
+        np.random.shuffle(y_train)
+
+        print(x_train, y_train)
 
         # import tensorflow as tf
         # dataset = tf.data.Dataset.from_tensor_slices((train_data, tf.one_hot(labels, 5)))

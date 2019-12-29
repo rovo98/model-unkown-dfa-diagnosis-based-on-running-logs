@@ -57,26 +57,29 @@ def evaluate_multi_head_model(
     """
 
     n_timesteps, n_features = train_x.shape[1], train_x.shape[2]
-    verbose, epochs, batch_size = 1, 10, 32
+    verbose, epochs, batch_size = 1, 30, 32
 
     # head 1
     inputs1 = Input(shape=(n_timesteps, n_features))
-    conv1 = Conv1D(filters=64, kernel_size=3, activation='relu')(inputs1)
-    drop1 = Dropout(0.5)(conv1)
+    conv1 = Conv1D(filters=64, kernel_size=31, activation='relu')(inputs1)
+    conv1_2 = Conv1D(filters=64, kernel_size=31, activation='relu')(conv1)
+    drop1 = Dropout(0.5)(conv1_2)
     pool1 = MaxPool1D(pool_size=2)(drop1)
     flat1 = Flatten()(pool1)
 
     # head 2
     inputs2 = Input(shape=(n_timesteps, n_features))
-    conv2 = Conv1D(filters=64, kernel_size=5, activation='relu')(inputs2)
-    drop2 = Dropout(0.5)(conv2)
+    conv2 = Conv1D(filters=64, kernel_size=33, activation='relu')(inputs2)
+    conv2_2 = Conv1D(filters=64, kernel_size=33, activation='relu')(conv2)
+    drop2 = Dropout(0.5)(conv2_2)
     pool2 = MaxPool1D(pool_size=2)(drop2)
     flat2 = Flatten()(pool2)
 
     # head 3
     inputs3 = Input(shape=(n_timesteps, n_features))
-    conv3 = Conv1D(filters=64, kernel_size=11, activation='relu')(inputs3)
-    drop3 = Dropout(0.5)(conv3)
+    conv3 = Conv1D(filters=64, kernel_size=37, activation='relu')(inputs3)
+    conv3_2 = Conv1D(filters=64, kernel_size=37, activation='relu')(conv3)
+    drop3 = Dropout(0.5)(conv3_2)
     pool3 = MaxPool1D(pool_size=2)(drop3)
     flat3 = Flatten()(pool3)
 
@@ -89,7 +92,9 @@ def evaluate_multi_head_model(
     model = Model(inputs=[inputs1, inputs2, inputs3], outputs=outputs)
 
     # save a plot of the model
-    plot_model(model, show_shapes=True, to_file='multi_channel.png')
+    model_plot_name = 'multi_channel_06.png'
+    plot_model(model, show_shapes=True, to_file=model_plot_name)
+    print('model plot saved: {}'.format(model_plot_name))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     # fit network
@@ -99,7 +104,7 @@ def evaluate_multi_head_model(
 
     # save the model
     if save_model:
-        model_name = 'fd1dcovnet_multichannel.h5'
+        model_name = 'fd1dcovnet_multichannel_06.h5'
         model.save(model_name)
         print('> model {} saved.'.format(model_name))
     return accuracy
@@ -138,15 +143,18 @@ def run_experiment(repeats=10):
     print('>>> training and testing dataset loaded successfully!')
 
     # repeat experiment
-    scores = list()
-    for r in range(repeats):
-        score = evaluate_multi_head_model(train_x, train_y, test_x, test_y, num_of_faulty_type)
-        score = score * 100.0
-        print('>#%d: %.3f' % (r + 1, score))
-        scores.append(score)
+    # scores = list()
+    # for r in range(repeats):
+    #     score = evaluate_multi_head_model(train_x, train_y, test_x, test_y, num_of_faulty_type)
+    #     score = score * 100.0
+    #     print('>#%d: %.3f' % (r + 1, score))
+    #     scores.append(score)
 
+    score = evaluate_multi_head_model(train_x, train_y, test_x, test_y, num_of_faulty_type, True)
+    score = score * 100.0
+    print('>#%d test acc: %.3f' % (1, score))
     # summarize results.
-    summarize_results(scores)
+    # summarize_results(scores)
 
 
 # Driver the program to test the method above.

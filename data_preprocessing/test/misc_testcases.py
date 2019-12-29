@@ -62,7 +62,15 @@ class MyTestCase(unittest.TestCase):
                      'vldsxvslddvslbbvwblT2']
 
         import utils.log_encoding as log_encoding
+
+        # loading encoding configuration
         log_encoding.load_config('2019-12-28 16:43:36_czc1OmZzNzphczE1OmZlczQ=_config')
+
+        print('character frequency mappings:')
+        print(log_encoding.CHARACTER_ENCODING_MAPPINGS)
+        print('max column size: ')
+        print(log_encoding.MAX_COLUMN_SIZE)
+
         encoded_logs = []
         for rl in test_logs:
             features, label = log_encoding.encode_log(rl, num_of_faulty_type=5)

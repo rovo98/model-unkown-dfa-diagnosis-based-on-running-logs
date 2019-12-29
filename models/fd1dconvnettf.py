@@ -69,7 +69,7 @@ def evaluate_model(
 
     # save the model
     if save_model:
-        model_name = 'fd1dcovnet.h5'
+        model_name = 'fd1dconvnet.h5'
         model.save(model_name)
         print('> model {} saved.'.format(model_name))
     return accuracy
@@ -84,7 +84,7 @@ def summarize_results(scores, params):
 
     # boxplot of scores
     plt.boxplot(scores, labels=params)
-    plt.savefig('exp_cnn_kernel.png')
+    plt.savefig('./exper_imgs/exp_cnn_kernel_04.png')
 
 
 def run_experiment(repeats=10):
@@ -110,7 +110,7 @@ def run_experiment(repeats=10):
 
     print('>>> training and testing dataset loaded successfully!')
 
-    n_params = [13, 15, 17]
+    n_params = [29, 31, 33, 37]
     all_scores = list()
 
     for p in n_params:

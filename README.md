@@ -32,9 +32,9 @@ RNNs and LSTM may does better than CNNs for this classification task.
 
 ![1dcovnet_training_example_03](./images/1dcovnet_training_test_03_100-epochs.png)
 
-#### Hyperparameters tuning
+#### CNN tuning
 
-调整 CNN 中调整的超参数。
+调整 CNN 中调整的超参数 (hyper-parameters)。
 
 ##### 1. 一次随意尝试
 
@@ -81,7 +81,7 @@ Using gpu to reduce time for training.
 ![](./images/1dconvnet_training_test_05_kernel_size_01.png)
 > 完成测试，所花费的时间还是 3 个多小时，测试集准确率是 mean 均值，后面是标准差。
 
-![](./images/1dconvnet_traning_test_05_kernel_size_02_exp_cnn_kernel.png)
+![](images/1dconvnet_training_test_05_kernel_size_01_exp_cnn_kernel.png)
 > 从该盒形图中可以明显看出，随着 ``kernel_size`` 的增加，测试准确率中值（黄色线）不断上升，且所有超参数取值对应的测试准确率稳定性非常好。
 >
 > 从测试来看，``kernel_size`` 取 ``11`` 具有非常不错的效果。
@@ -90,9 +90,96 @@ Using gpu to reduce time for training.
 >
 > REMARKS: 原因分析：我们知道 kernel size 卷积核的大小是确定时间步长的大小，影响的是对输入序列消息的读取，从效果上看，随着 kernel size 的增大，模型效果越好。可能原因是，输入的数据从原始数据经过编码表示后，是一个维度较高且非常细稀疏的 tensor。适当增大 kernel size 反而能够更好处理这样的数据。
 
+使用比上面 ``11`` 更大的一个范围再次进行测试，结果如下:
+
+![](./images/1dconvnet_training_test_05_kernel_size_02.png)
+> 耗时 3 个多小时，可以看到，测试精准率均值都非常高，且它们的稳定性都很好。
+
+![](./images/1dconvnet_training_test_05_kernel_size_02_exp_cnn_kernel.png)
+> 从该图中看的话，``kernel`` 取 ``19`` 是最好的。
+>
+> 因为，随着 kernel size 的增加，测试精准率中值（黄色线）不断上升，意味着，可能还有上升空间，因此可以再次设计实验了测试一组更大的 kernel size。
+
+![](./images/1dconvnet_training_test_05_kernel_size_03.png)
+> 耗费 5 个多小时，随着 kernel size 的增大，训练时间变长。
+
+![](./images/1dconvnet_training_test_05_kernel_size_03_exp_cnn_kernel_03.png)
+> 从图中，可以看到，随着 kernel size 的增大，测试集精准率中值（黄色线）不断上升，虽然图中有些许离群点 (outlines)。
+>
+> 表现最好的是 ``27`` 大小 kernel size 的情况。
+>
+> 从上图看，我们还可以再次设计一个更大的范围进行实验。。。
+
+
+![](./images/1dconvnet_training_test_05_kernel_size_04.png)
+> 耗时将近 4 个小时。
+
+![](./images/1dconvnet_training_test_05_kernel_size_04_exp_cnn_kernel_04.png)
+> 相比于之前的值 ``27``, 除了 ``29`` 有两个表现不是很好的离群点外，其他的所有测试结果都比 ``27`` 的要好，这次测试中表现最好的是 ``37``。
+>
+> 这么看，我们还是可以再设计实验来探索更好的 kernel size 取值。
+
+
+
+**需要注意的是，上面的所有调优都是固定其他 hyper-parameter, 然后再探索某个参数的最优值，最后组合形成的效果可能并不是真正的最优。**
+
+**例如：多个参数一起可以形成不同的组合，(如在确定了最优 kernel size 后，再次看在不同 filters 下此 kernel size 的效果) 等等。且实验中，测试是重复 10 次来看稳定性，我们还可以适当提高重复次数，再看看稳定性。**
+
+#### Multi-Channel (head) CNN
+
+multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取，在 flatten 层之后再将它们全部 concatenate 拼接在一起）
+
+##### 1. 简单尝试
+
+网络结构如下:
+
+![](./images/1dconvnet_training_multi_head_01_multi_channel_01.png)
+> 三个 head 使用 filters 均为 ``64``, 使用的 kernel size 分别为 ``15``, ``17``, ``19``，且只有一层卷积层。pool_size 均为 ``2``， ``dropout`` 都是 ``0.5``。
+
+由于是一次随意的尝试，先不考虑训练出来的模型的稳定性，优先考虑性能，只做一次训练，结果如下:
+![](./images/1dconvnet_training_multi_head_01_multi_channel_01_test.png)
+> 训练 10 epochs 后，可以看到效果还行，估计还有很大提升空间，可以在对网络的结构进行调整。
+
+##### 2. multi-channel with 2 conv layers
+
+调整上面的网络结构，使用两层卷积层，并调整三个不同 head 的 kernel size 为 ``17``, ``19``, ``21``。
+
+![](./images/1dconvnet_training_multi_head_02_multi_channel.png)
+
+训练结果如下:
+
+![](./images/1dconvnet_training_multi_head_02_multi_channel_test.png)
+> 效果其实和只使用一个 head (kernel size 为 17， 19， 或者 21) 的 1dconvnet 的效果表现其实差不多。
+>
+> REMARKS: 后续测试可以测试稳定性，以及对不同的 head 的 kernel size 再作出调整。
+
+**NOTICE: 网络结构变复杂后，模型拟合达到好的效果，所需的数据量会大幅度增加，因此我们还可以尝试适当增加 epochs 的数量 (以上实验中使用 epoch 数量都控制在 10 左右，主要想快速衡量模型的优秀程度)**
+
+下面给出的是，一些网络结构调整过后的测试一次测试结果（epochs 不定）
+
+![](./images/1dconvnet_training_multi_head_03_multi_channel_02.png)
+![](./images/1dconvnet_training_multi_head_03_multi_channel_02_test.png)
+
+![](./images/1dconvnet_training_multi_head_04_multi_channel_03.png)
+![](./images/1dconvnet_training_multi_head_04_multi_channel_03_test.png)
+
+![](./images/1dconvnet_training_multi_head_05_multi_channel_04.png)
+![](./images/1dconvnet_training_multi_head_05_multi_channel_04_test.png)
+
+![](./images/1dconvnet_training_multi_head_06_multi_channel_05.png)
+![](./images/1dconvnet_training_multi_head_06_multi_channel_05_test.png)
+
+选择上面探索出来的比较好的 filters 和 kernel size 的取值，进行组合。
+
+![](./images/1dconvnet_training_multi_head_07_multi_channel_06.png)
+![](./images/1dconvnet_training_multi_head_07_multi_channel_06_test.png)
+> 效果是好了一点。
+
 ### 3. RNNs
 
-### 4. LSTM
+#### Simple RNN or GRN
+
+#### LSTM
 
 可先尝试只使用 LSTM 的方案。
 
@@ -109,7 +196,6 @@ Full CNNs with LSTM
 可以先尝试自己使用传统的机器学习方法，用 MLP (multi-layer Perceptron network) 前馈网络来进行实验。之后再参考他人应用于文本序列分类的模型（通常是深度学习方法，即让模型自动做表示学习，自动抽取高层特征）。
 
 > 放弃尝试说手动进行特征抽取的方式，例如对于文本分类，Bow (Bag of words) 需具备一定的专业知识专家才能来定所要使用的 vocabulary。
-
 
 参考 **A Compact Encoding for Efficient Character-level Deep Text Classification-marinho2018** 中 Character-Level (字符级别) 紧凑编码来处理输入的日志中的观察。之后再考虑配合 CNNs 或 RNNs 或者 LSTM (Long Short Term Memory) 模型来训练。
 

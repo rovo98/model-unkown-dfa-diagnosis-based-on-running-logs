@@ -38,7 +38,8 @@ class MyTestCase(unittest.TestCase):
         for gpu in physical_devices:
             tf.config.experimental.set_memory_growth(gpu, True)
 
-        model = load_model('../fd1dcovnet.h5')
+        # model = load_model('../fd1dcovnet.h5')
+        model = load_model('../fd1dcovnet_multichannel_06.h5')
 
         print('model loaded successfully.')
         self.assertIsNotNone(model)
@@ -47,7 +48,9 @@ class MyTestCase(unittest.TestCase):
         print(observations)
 
         # do predictions on the given dataset.
-        predictions = model.predict(tf.cast(observations, tf.float16))
+        input_x = tf.cast(observations, tf.float16)
+        # predictions = model.predict(tf.cast(observations, tf.float16))
+        predictions = model.predict([input_x, input_x, input_x])
 
         print('prediction: ', predictions)
 

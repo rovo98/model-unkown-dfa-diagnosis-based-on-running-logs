@@ -62,12 +62,14 @@ class MyTestCase(unittest.TestCase):
         print(x_train, y_train)
         print(len(x_train), len(y_train))
         print(len(x_test), len(y_test))
+
         np.random.seed(200)
         np.random.shuffle(x_train)
         np.random.seed(200)
         np.random.shuffle(y_train)
 
         print(x_train, y_train)
+        print(y_train.shape)
 
         # import tensorflow as tf
         # dataset = tf.data.Dataset.from_tensor_slices((train_data, tf.one_hot(labels, 5)))

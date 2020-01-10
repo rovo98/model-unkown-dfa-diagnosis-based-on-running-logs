@@ -1,5 +1,7 @@
 # utils func for encoding running log using compressed numerical vector in ndarray.
 # rovo98
+# since 2019.12.24
+
 
 import os
 import numpy as np
@@ -20,11 +22,9 @@ def encode_log(log, num_of_faulty_type):
     :type log: str
     :type num_of_faulty_type: int
 
-    Args
-        log: a raw running log <str>
-        num_of_faulty_type: the number of the faults of DES.
-    Returns
-        encoded log represented using ndarray, features, labels
+    :param log: a raw running log <str>
+    :param num_of_faulty_type: the number of the faults of DES.
+    :return: encoded log represented using ndarray, features, labels
     """
     # basic check
     if len(CHARACTER_ENCODING_MAPPINGS) == 0:
@@ -56,6 +56,9 @@ def encode_log(log, num_of_faulty_type):
 def load_config(filename):
     """Loading necessary configuration for encoding running logs.
     HELPER function of above.
+
+    :type filename: str
+    :param filename: name of the configuration file to be loaded.(in preset location).
     """
 
     global CHARACTER_ENCODING_MAPPINGS, MAX_COLUMN_SIZE

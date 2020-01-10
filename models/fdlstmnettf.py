@@ -11,6 +11,7 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import LSTM
 from tensorflow.keras.layers import Input
+from tensorflow.keras.layers import Dropout
 from tensorflow.keras.utils import plot_model
 
 from model_data_input import load_dataset_group
@@ -47,16 +48,18 @@ def evaluate_lstm_model(
     """
 
     n_timesteps, n_features = train_x.shape[1], train_x.shape[2]
-    verbose, epochs, batch_size = 1, 10, 32
+    verbose, epochs, batch_size = 1, 15, 32
 
     model = Sequential(name='fdlstmnet')
     model.add(Input(shape=(n_timesteps, n_features)))
-    model.add(LSTM(lstm_output_size, dropout=0.2, recurrent_dropout=0.2))
+    model.add(LSTM(lstm_output_size))
+    model.add(Dropout(0.2))
+    model.add(Dense(128, activation='selu'))
     model.add(Dense(n_outputs, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     # save a plot of the model
-    model_plot_name = './model_archs/fdlstmnet.png'
+    model_plot_name = './model_archs/fdlstmnet_01.png'
     plot_model(model, show_shapes=True, to_file=model_plot_name)
     print('model plot saved: {}'.format(model_plot_name))
 
@@ -67,7 +70,7 @@ def evaluate_lstm_model(
 
     # save the model
     if save_model:
-        model_name = 'fdlstmnet.h5'
+        model_name = './trained_saved/fdlstmnet_czc1OmZzNzphczE1OmZlczQ=.h5'
         model.save(model_name)
         print('> model {} saved.'.format(model_name))
     return accuracy
@@ -122,6 +125,7 @@ def run_experiment(repeats=10):
 
 # Driver the program to test the method above.
 if __name__ == '__main__':
+    # FIXME: current model structure is not working well with the classification task.
     start_time = time.perf_counter()
     run_experiment()
     end_time = time.perf_counter()

@@ -9,9 +9,9 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import LSTM
 from tensorflow.keras.layers import MaxPool1D
+from tensorflow.keras.layers import Dropout
 from tensorflow.keras.utils import plot_model
 
 from model_data_input import load_dataset_group
@@ -53,17 +53,17 @@ def evaluate_cnn_lstm_model(
     verbose, epochs, batch_size = 1, 10, 32
 
     model = Sequential(name='fd1dcovnet_cnn_lstm')
-    model.add(Conv1D(filters=64, kernel_size=37, activation='relu', input_shape=(n_timesteps, n_features)))
-    model.add(Conv1D(filters=64, kernel_size=37, activation='relu'))
-    model.add(Dropout(0.5))
+    model.add(Conv1D(filters=64, kernel_size=41, activation='selu', input_shape=(n_timesteps, n_features)))
+    model.add(Conv1D(filters=64, kernel_size=41, activation='selu'))
     model.add(MaxPool1D(pool_size=2))
     model.add(LSTM(lstm_output_size))
-    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Dense(100, activation='selu'))
     model.add(Dense(n_outputs, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     # save a plot of the model
-    model_plot_name = './model_archs/fdcnnlstmnet1.png'
+    model_plot_name = './model_archs/fdcnnlstmnet1_03.png'
     plot_model(model, show_shapes=True, to_file=model_plot_name)
     print('model plot saved: {}'.format(model_plot_name))
 
@@ -74,7 +74,7 @@ def evaluate_cnn_lstm_model(
 
     # save the model
     if save_model:
-        model_name = 'fd1dconvnet_cnn_lstm.h5'
+        model_name = './trained_saved/fd1dconvnet_cnn_lstm_czc1OmZzNzphczE1OmZlczQ=.h5'
         model.save(model_name)
         print('> model {} saved.'.format(model_name))
     return accuracy
@@ -128,6 +128,7 @@ def run_experiment(repeats=10):
 
 # Driver the program to test the method above.
 if __name__ == '__main__':
+    # FIXME: current model structure is not working well with the classification task.
     start_time = time.perf_counter()
     run_experiment()
     end_time = time.perf_counter()

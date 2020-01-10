@@ -1,5 +1,6 @@
 # utils functions for saving and loading sparse matrix
 # author rovo98
+# since 2019.12.24
 
 from scipy.sparse import csr_matrix
 import numpy as np
@@ -13,9 +14,9 @@ def save_sparse_csr(filename, array):
     :type array: np.array
     :rtype None
 
-    Arguments
-        filename: the name of the file to save data.
-        array : csr (compressed sparse row) matrix
+    :param filename: the name of the file to save data.
+    :param array : csr (compressed sparse row) matrix
+    :return: nothing.
     """
     np.savez_compressed(filename, data=array.data, indices=array.indices,
                         indptr=array.indptr, shape=array.shape)
@@ -27,8 +28,8 @@ def load_sparse_csr(filename):
     :type filename: str
     :rtype csr_matrix
 
-    Arguments
-        filename: the name of the npz file to load data.
+    :param filename: the name of the npz file to load data.
+    :return: loaded csr_matrix object.
     """
     loader = np.load(filename)
     return csr_matrix((loader['data'], loader['indices'],
@@ -41,11 +42,9 @@ def save_object(filename, obj):
     :type filename: str
     :type obj: any
 
-    Arguments
-        filename: name of the file to be written
-        obj: the object to be written
-    Returns
-        None
+    :param filename: name of the file to be written
+    :param obj: the object to be written
+    :return: Nothing.
     """
     with open(filename, 'wb') as output:
         pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
@@ -56,11 +55,9 @@ def load_object(filename):
 
     :type filename: str
 
-    Args
-        filename: name of the file to loaded
+    :param filename: name of the file to loaded
 
-    Returns
-        one object contained in the specified file.
+    :return: one object contained in the specified file.
     """
     with open(filename, 'rb') as f_input:
         return pickle.load(f_input)

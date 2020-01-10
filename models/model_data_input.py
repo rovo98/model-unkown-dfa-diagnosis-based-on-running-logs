@@ -9,25 +9,27 @@ from tensorflow.keras.utils import to_categorical
 from raw_data_processing import GENERATED_LOGS_LOC
 from utils.load_and_save import load_sparse_csr
 
+# FIXME: APIs design may needed to be refactored current design is less elegant and complex.
 
-def load_dataset_group(filename, num_of_classes, num=1):
+
+def load_dataset_group(filename, num_of_classes, num=1, location=GENERATED_LOGS_LOC):
     """Loads np.arrays (data) from the specified location.
 
     :type filename: str
     :type num: int
     :type num_of_classes: int
+    :type location: str
     :rtype numpy array, numpy array
 
-    Args
-        filename: name of the file that saves the data, or prefix of a bunch of files saving the data.
-        num: number of files to be loaded. default 1
-
-    Returns
-        dataset represented in np.array, features and labels
+    :param filename: name of the file that saves the data, or prefix of a bunch of files saving the data.
+    :param num: number of files to be loaded. default 1
+    :param num_of_classes: number of the classes of the labels.
+    :param location: location of the files to be loaded.
+    :return: dataset represented in np.array, features and labels
     """
 
     if num < 2:
-        path = GENERATED_LOGS_LOC + os.sep + filename + '.npz'
+        path = location + os.sep + filename + '.npz'
         print('File to be loading: {}'.format(path))
         data = load_sparse_csr(path)
         data = data.todense()
@@ -37,7 +39,7 @@ def load_dataset_group(filename, num_of_classes, num=1):
     else:
         result_features, result_labels = None, None
         for i in range(num):
-            path = GENERATED_LOGS_LOC + os.sep + filename + str(i) + '.npz'
+            path = location + os.sep + filename + str(i) + '.npz'
             print('file to be loading: {}'.format(path))
             data = load_sparse_csr(path)
             data = data.todense()
@@ -71,16 +73,16 @@ def preprocess_dataset(
     :type batch_size: int
     :type shuffle_buffer_size: int
 
-    Args
-        train_features:
-        train_labels:
-        test_features:
-        test_labels:
-        num_of_fault: the number of the faulty mode (depends on generated DFA)
-        batch_size:
-        shuffle_buffer_size:
-    Returns
-        batched training and testing dataset (tf.data.Dataset)
+    :param train_features: training features in ndarray representation.
+    :param train_labels:    training labels in ndarray representation.
+    :param test_features: testing features in ndarray representation.
+    :param test_labels: testing labels in ndarray representation.
+    :param num_of_faulty_type: the number of the faulty mode (depends on generated DFA)
+    :param batch_size: A `tf.int64` scalar `tf.Tensor`, representing the number
+            of consecutive elements of this dataset to combine in a single batch.
+    :param shuffle_buffer_size: A `tf.int64` scalar `tf.Tensor`, representing
+            the number of elements from this dataset from which the new dataset will sample.
+    :return: batched training and testing dataset (tf.data.Dataset)
     """
 
     train_dataset = tf.data.Dataset.from_tensor_slices(

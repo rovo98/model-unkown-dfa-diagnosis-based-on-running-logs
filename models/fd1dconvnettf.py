@@ -32,7 +32,7 @@ def evaluate_model(
         test_x,
         test_y,
         n_outputs,
-        kernel_size,
+        n_filters,
         save_model=False):
     """fit and evaluate a model.
 
@@ -48,17 +48,18 @@ def evaluate_model(
     """
 
     n_timesteps, n_features = train_x.shape[1], train_x.shape[2]
+    # using default batch size (mini-batch gradient descent approach)
     verbose, epochs, batch_size = 1, 15, 32
 
     model = Sequential(name='fd1dcovnet')
-    model.add(Conv1D(filters=64, kernel_size=kernel_size, activation='relu', input_shape=(n_timesteps, n_features)))
-    model.add(Conv1D(filters=64, kernel_size=kernel_size, activation='relu'))
+    model.add(Conv1D(filters=n_filters, kernel_size=31, activation='relu', input_shape=(n_timesteps, n_features)))
+    model.add(Conv1D(filters=n_filters, kernel_size=31, activation='relu'))
     model.add(Dropout(0.5))
     model.add(MaxPool1D(pool_size=2))
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
     model.add(Dense(n_outputs, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
 
     # print(model.summary())
 
@@ -69,7 +70,7 @@ def evaluate_model(
 
     # save the model
     if save_model:
-        model_name = 'fd1dconvnet.h5'
+        model_name = 'fd1dconvnet_czc1OmZzNzphczE1OmZlczQ=.h5'
         model.save(model_name)
         print('> model {} saved.'.format(model_name))
     return accuracy
@@ -84,7 +85,7 @@ def summarize_results(scores, params):
 
     # boxplot of scores
     plt.boxplot(scores, labels=params)
-    plt.savefig('./exper_imgs/exp_cnn_kernel_04.png')
+    plt.savefig('./exper_imgs/exp_cnn_filters__kernel_size=31_02.png')
 
 
 def run_experiment(repeats=10):
@@ -110,7 +111,7 @@ def run_experiment(repeats=10):
 
     print('>>> training and testing dataset loaded successfully!')
 
-    n_params = [29, 31, 33, 37]
+    n_params = [96, 128, 192, 256]
     all_scores = list()
 
     for p in n_params:
@@ -133,6 +134,7 @@ def run_experiment(repeats=10):
 
 # Driver the program to test the method above.
 if __name__ == '__main__':
+    # TODO: Refactoring is needed. Extracting the common codes (same implementations) in current folder's modules.
     start_time = time.perf_counter()
     run_experiment()
     end_time = time.perf_counter()

@@ -1,5 +1,6 @@
 # using techniques like over-sampling and under-sampling to deal with the imbalanced raw data.
 # rovo98
+# since 2019.12.24
 
 import random
 import copy
@@ -11,13 +12,9 @@ def over_sampling(given_list, target_size):
     :type given_list: list
     :type target_size: int
 
-    Arguments
-        l: <list> A list contains any type of elements.
-        target_size: the target size of the new list after doing over sampling.
-
-    Returns
-        A list of new elements after doing over sampling with the length of `target_size`
-
+    :param given_list: <list> A list contains any type of elements.
+    :param target_size: the target size of the new list after doing over sampling.
+    :return: A list of new elements after doing over sampling with the length of `target_size`
     """
     # base checking
     if len(given_list) > target_size:
@@ -47,11 +44,9 @@ def under_sampling(given_list, target_size):
     :type given_list: list
     :type target_size: int
 
-    Arguments
-        given_list: <list> A list containing any type of elements.
-        target_size: <int> the new size of the result list after doing under sampling.
-    Returns
-        A result list contains elements after doing under sampling operation.
+    :param given_list: <list> A list containing any type of elements.
+    :param target_size: <int> the new size of the result list after doing under sampling.
+    :return: A result list contains elements after doing under sampling operation.
     """
     # basic validation is needed
     if len(given_list) <= target_size:

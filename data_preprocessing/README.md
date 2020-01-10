@@ -6,7 +6,7 @@
 
 对于文本分类问题，使用 CNNs 面临的主要问题是如何将文本使用 numerical vector (数字向量) 来进行表示。
 
-**A Compact Encoding for Efficient Character-level Deep Text Classification-marinho2018** 中提供了一种紧凑的字符级别编码方案。
+**A Compact Encoding for Efficient Character-level Deep Text Classification-marinho-2018** 中提供了一种紧凑的字符级别编码方案。
 
 使用基于 tagged Huffman encoding 的修改版:
 
@@ -20,7 +20,7 @@
 
 ![compact-encoding-example-02](./images/compact-encoding-example_2.png)
 
-回到我研究的课题上，需要处理的序列是 running-logs 运行日志，是 DES 可观事件组成的序列，因此与编码有关的参数可能是：
+回到研究的课题上，需要处理的序列是 running-logs 运行日志，是 DES 可观事件组成的序列，因此与编码有关的参数可能是：
 
 1. size of observable events: 可观事件集的大小，以确定字符编码的最长长度；
 2. length of running log in training data: 模型训练数据中日志的长度

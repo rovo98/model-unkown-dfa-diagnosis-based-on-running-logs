@@ -27,8 +27,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_loading_encoded_logs(self):
         path = GENERATED_LOGS_LOC + os.sep
-        # path = path + '2019-12-26 20:31:36_czgxOmZzODphczIwOmZlczQ=_processed_logs.npz'
-        path = path + '2019-12-26 20:38:06_czEwMjpmczEwOmFzMTc6ZmVzNA==_processed_logs_ep0.npz'
+        path = path + '2019-12-31 23:47:12_czEwMjpmczEwOmFzMTc6ZmVzNA==_processed_logs_ep0'
         data = load_sparse_csr(path)
         self.assertIsNotNone(data)
         print(data)

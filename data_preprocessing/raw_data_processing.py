@@ -1,5 +1,6 @@
 # loading raw data, processing them, and save to a csv file.
 # author rovo98
+# since 2019.12.24
 
 import os
 import re
@@ -23,7 +24,7 @@ CHARACTER_ENCODING_MAPPINGS = {}  # stores the mappings between raw observation 
 RAW_RUNNING_LOGS = []  # list for storing un-processed running logs.
 
 MAX_COLUMN_SIZE = 0  # maximum number of columns for processed observation of logs.
-OBSERVATION_LENGTH = 50  # the maximum length of the observation of logs in training data.
+OBSERVATION_LENGTH = 100  # the maximum length of the observation of logs in training data.
 SIZE_OF_EACH_LOG_TYPE = []
 
 GENERATED_LOGS_LOC = '../dataset'  # location to save the processed running logs
@@ -38,18 +39,14 @@ def load_data(filename, raw_data_path=DEFAULT_RAW_DATA_PATH):
     :type filename: str
     :type raw_data_path: str
 
-    Arguments
-    ---
-    filename: str
-        filename of the file containing running logs.
-    raw_data_path: str
-        the path of the logs located.
+    :param filename: name of the file containing running logs.
+    :param raw_data_path: the path of the logs located.
     """
 
     global DEFAULT_GENERATED_LOG_FILE_NAME
     DEFAULT_GENERATED_LOG_FILE_NAME = filename.split('_')[1]
 
-    print('>>> loading raw data...\n')
+    print('>>> loading raw data, file to be loaded: {}...\n'.format(filename))
 
     path = raw_data_path + os.sep + filename
     with open(path, 'r') as f:
@@ -132,13 +129,11 @@ def load_data(filename, raw_data_path=DEFAULT_RAW_DATA_PATH):
 
 def encode_and_save_logs(filename='processed_logs'):
     """encoding running logs in global variable RAW_RUNNING_LOGS using method mentioned in README.md
+    Encoding running logs, and then save them to the specified file.
 
     :type filename: str
 
-    Arguments
-        filename: name of the file to save logs.
-
-    Encoding running logs, and then save them to the specified file.
+    :param filename: name of the file to save logs.
     """
 
     # basic validation
@@ -185,12 +180,9 @@ def transform_observation(log):
 
     :type log: list
 
-    Arguments
-        log: A running log <list> type contains observation, label, structure like
+    :param log: A running log <list> type contains observation, label, structure like
             [observation, label]
-
-    Returns
-        A encoded running log. <list> and the last element is the label of the log.
+    :return: A encoded running log. <list> and the last element is the label of the log.
     """
 
     # basic check
@@ -203,6 +195,9 @@ def transform_observation(log):
     for c in log[0]:
         encoded_observation.extend(CHARACTER_ENCODING_MAPPINGS.get(c))
     # zero padding.
+    # additional checking
+    if MAX_COLUMN_SIZE < len(encoded_observation):
+        raise Exception('Encoding error, please checking the OBSERVATION_LENGTH.')
     padding_len = MAX_COLUMN_SIZE - len(encoded_observation)
     encoded_observation.extend([0] * padding_len)
 
@@ -220,9 +215,8 @@ def save_as_npz(logs, filename):
     :type filename: str
     :rtype None
 
-    Arguments
-        logs: a list of encoded running logs.
-        filename: the name of the file to save the logs.
+    :param: logs: a list of encoded running logs.
+    :param filename: the name of the file to save the logs.
     """
 
     # basic checking
@@ -247,11 +241,7 @@ def save_encoding_config(filename='config'):
 
     :type filename: str
 
-    Args
-        filename: name of the file to save configuration of current dataset.
-
-    Returns
-        None
+    :param filename: name of the file to save configuration of current dataset.
     """
     from utils.load_and_save import save_object
     filename = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '_' + \
@@ -268,18 +258,19 @@ def save_encoding_config(filename='config'):
 
 # Driver the program to test the method above.
 if __name__ == '__main__':
+    # FIXME: Refactoring maybe needed, current configuring method is less elegant.
     # REMARKS: checking all configuration before launch the program.
     # NOTICE: Check OBSERVATION_LENGTH before launch the program.
-
+    OBSERVATION_LENGTH = 40
     # load_data('2019-12-23 18:33:31_czgxOmZzODphczIwOmZlczQ=_running-logs.txt')
     # load_data('2019-12-24 21:33:29_czEwMjpmczEwOmFzMTc6ZmVzNA==_running-logs.txt')
     # load_data('2019-12-23 18:34:59_czY3OmZzNjphczE2OmZlczM=_running-logs.txt')
-    load_data('2019-12-28 00:41:55_czc1OmZzNzphczE1OmZlczQ=_running-logs.txt')
+    # load_data('2019-12-28 00:41:55_czc1OmZzNzphczE1OmZlczQ=_running-logs.txt')
+    # load_data('2020-01-09 22:56:13_czE4OmZzNDphczE2OmZlczI=_running-logs.txt')
+    load_data('2020-01-10 21:16:34_czE4OmZzNDphczE2OmZlczI=_running-logs.txt')
     print('Filled configurations: ')
     print('max column size:', MAX_COLUMN_SIZE)
     print('size of each log type: ', SIZE_OF_EACH_LOG_TYPE)
     encode_and_save_logs()
     # save configuration of current processed running logs.
     save_encoding_config()
-    # print(RAW_RUNNING_LOGS)
-    # print(len(RAW_RUNNING_LOGS))

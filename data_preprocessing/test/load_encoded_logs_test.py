@@ -1,7 +1,7 @@
 import unittest
 
 import os
-from utils.load_and_save import load_sparse_csr
+from data_preprocessing.utils.load_and_save import load_sparse_csr
 
 GENERATED_LOGS_LOC = '../../dataset'
 
@@ -27,7 +27,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_loading_encoded_logs(self):
         path = GENERATED_LOGS_LOC + os.sep
-        path = path + '2019-12-31 23:47:12_czEwMjpmczEwOmFzMTc6ZmVzNA==_processed_logs_ep0'
+        path = path + '2020-01-10 21:20:48_czE4OmZzNDphczE2OmZlczI=_processed_logs.npz'
         data = load_sparse_csr(path)
         self.assertIsNotNone(data)
         print(data)
@@ -46,35 +46,46 @@ class MyTestCase(unittest.TestCase):
         size = len(train_data)
         print('size: {}'.format(size))
 
-        print(train_data.reshape(1, size * 1400).reshape(1, size, 1400)[0])
-        print(train_data.reshape(size, 1, 1400).shape)
-        print(train_data.reshape(size, 1400, 1).shape)
-        print(train_data.shape)
-        print(np.expand_dims(train_data, axis=2).shape)
-
-        print(train_data[0].shape)
-        print(train_data[0].reshape((1, 1400)))
-
-        from sklearn.model_selection import train_test_split
-        from tensorflow.keras.utils import to_categorical
-        x_train, x_test, y_train, y_test = train_test_split(train_data, to_categorical(labels, 5), test_size=0.2)
-        print(x_train, y_train)
-        print(len(x_train), len(y_train))
-        print(len(x_test), len(y_test))
-
-        np.random.seed(200)
-        np.random.shuffle(x_train)
-        np.random.seed(200)
-        np.random.shuffle(y_train)
-
-        print(x_train, y_train)
-        print(y_train.shape)
+        # print(train_data.reshape(1, size * 1400).reshape(1, size, 1400)[0])
+        # print(train_data.reshape(size, 1, 1400).shape)
+        # print(train_data.reshape(size, 1400, 1).shape)
+        # print(train_data.shape)
+        # print(np.expand_dims(train_data, axis=2).shape)
+        #
+        # print(train_data[0].shape)
+        # print(train_data[0].reshape((1, 1400)))
+        #
+        # from sklearn.model_selection import train_test_split
+        # from tensorflow.keras.utils import to_categorical
+        # x_train, x_test, y_train, y_test = train_test_split(train_data, to_categorical(labels, 5), test_size=0.2)
+        # print(x_train, y_train)
+        # print(len(x_train), len(y_train))
+        # print(len(x_test), len(y_test))
+        #
+        # np.random.seed(200)
+        # np.random.shuffle(x_train)
+        # np.random.seed(200)
+        # np.random.shuffle(y_train)
+        #
+        # print(x_train, y_train)
+        # print(y_train.shape)
 
         # import tensorflow as tf
         # dataset = tf.data.Dataset.from_tensor_slices((train_data, tf.one_hot(labels, 5)))
         # dataset = dataset.shuffle(100).batch(32)
         # for batches, labels in dataset.take(1):
         #     print(batches.shape)
+
+    def test_loading_encoded_logs_rnn(self):
+        import numpy as np
+
+        path = GENERATED_LOGS_LOC + os.sep
+        path = path + '2020-02-22 20:34:10_czE4OmZzNDphczE2OmZlczI=_processed_logs_rnn.npz'
+        data = np.load(path, allow_pickle=True)
+        self.assertIsNotNone(data)
+        logs = data['data']
+        print(logs)
+        print(logs.shape)
 
 
 if __name__ == '__main__':

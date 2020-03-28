@@ -6,7 +6,7 @@
 import os
 import numpy as np
 from tensorflow.keras.utils import to_categorical
-from utils.load_and_save import load_object
+from data_preprocessing.utils.load_and_save import load_object
 
 CHARACTER_ENCODING_MAPPINGS = {}  # events to compressed code mappings of DES
 MAX_COLUMN_SIZE = 0  # maximum column size of encoded log representation.
@@ -26,6 +26,7 @@ def encode_log(log, num_of_faulty_type):
     :param num_of_faulty_type: the number of the faults of DES.
     :return: encoded log represented using ndarray, features, labels
     """
+
     # basic check
     if len(CHARACTER_ENCODING_MAPPINGS) == 0:
         raise Exception('CHARACTER_ENCODING_MAPPINGS is empty!')
@@ -53,15 +54,19 @@ def encode_log(log, num_of_faulty_type):
     return encoded_observation, label
 
 
-def load_config(filename):
+def load_config(filename, location=ENCODING_CONFIG_LOC):
     """Loading necessary configuration for encoding running logs.
-    HELPER function of above.
+    HELPER function of encode_log().
 
     :type filename: str
+    :type location: str
     :param filename: name of the configuration file to be loaded.(in preset location).
+    :param location: specified the location of the config to be loaded.
+                     by default: ENCODING_CONFIG_LOC global variable value is taken.
+                     [../../encoding-configs]
     """
 
     global CHARACTER_ENCODING_MAPPINGS, MAX_COLUMN_SIZE
-    path = ENCODING_CONFIG_LOC + os.sep + filename
+    path = location + os.sep + filename
     load_list = load_object(path)
     CHARACTER_ENCODING_MAPPINGS, MAX_COLUMN_SIZE = load_list[0], load_list[1]

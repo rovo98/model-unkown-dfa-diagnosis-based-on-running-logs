@@ -25,7 +25,6 @@ def over_sampling(given_list, target_size):
 
     result = copy.copy(given_list)
 
-    # print('nums :{}'.format(bias))
     if bias < original_size:
         result.extend(random.sample(given_list, k=bias))
     else:
@@ -39,7 +38,7 @@ def over_sampling(given_list, target_size):
 
 
 def under_sampling(given_list, target_size):
-    """Do under sampling on the given list, and returns the result
+    """Do under sampling on the given list, and returns the result.
 
     :type given_list: list
     :type target_size: int

@@ -27,26 +27,28 @@ class MyTestCase(unittest.TestCase):
     def test_over_sampling(self):
         test_list = [1, 0, 1, 1] * 1_000
         print(test_list)
-        from utils.imbalanced_preprocessing import over_sampling
+        from data_preprocessing.utils.imbalanced_preprocessing import over_sampling
         result = over_sampling(test_list, 10_000)
         print(result)
         self.assertIsNotNone(result)
         self.assertTrue(len(result) == 10_000)
 
     def test_under_sampling(self):
+        from data_preprocessing.utils.imbalanced_preprocessing import under_sampling
+
         test_list = [1, 0, 1] * 10_000
         print(test_list)
-        from utils.imbalanced_preprocessing import under_sampling
         result = under_sampling(test_list, 5_000)
         print(result)
         self.assertIsNotNone(result)
         self.assertTrue(len(result) == 5_000)
 
     def test_save_and_load_using_pickle(self):
+        from data_preprocessing.utils.load_and_save import save_object
+        from data_preprocessing.utils.load_and_save import load_object
+
         test_dict = {'a': [1, 0, 0, 1], 'b': [1, 1]}
         test_int = 100
-        from utils.load_and_save import save_object
-        from utils.load_and_save import load_object
         save_object('./test_config', [test_dict, test_int])
 
         loaded_list = load_object('./test_config')
@@ -56,12 +58,12 @@ class MyTestCase(unittest.TestCase):
         print(type(loaded_list[0]), type(loaded_list[1]))
 
     def test_encoding_new_log(self):
+        import data_preprocessing.utils.log_encoding as log_encoding
+       
         test_logs = ['vlwkkpqwdwlT4', 'ksvnbwxxwblbpnnklkbpwllxdwpkbddddlknkwpkbddddlT2',
                      'kdqsvblsxblsvnwkkT4', 'vlvnkswwslwwT1',
                      'vldsplwllxllvqnqkkkklkxT3', 'kslsxbkkwsvxsdssddkbspxkswpbwxxT0',
                      'vldsxvslddvslbbvwblT2']
-
-        import utils.log_encoding as log_encoding
 
         # loading encoding configuration
         log_encoding.load_config('2019-12-28 16:43:36_czc1OmZzNzphczE1OmZlczQ=_config')

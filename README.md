@@ -326,6 +326,21 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 
 > 该模型值得考虑。 有非常大的概率 LSTM 没有拟合训练数据。
 
+
+#### Applying new encoding approach
+
+> 之前提到，对于文本分类问题，我们首先遇到的第一个问题就是如何将文本转换成数字，即如何进行编码。
+> 之前使用的 Compact compressed character level encoding.
+
+使用不同的对原始运行日志的编码方式，即简单地将 ascii 码转换成数字。
+
+此时，我们转换成数字矩阵后的运行日志表示，它们的最大长度还是生成日志时的最大长度（不足长度的后面使用 0 进行填充）。在这种情况下，RNN 网络结构终于表示出非常不错的效果。
+
+![](./images/1dconvnet_training_arch_fdlstmnet_01_for_cnn_test.png)
+
+且由于模型的参数数量少，模型的训练时间也相应地减少了。
+> 可见，此编码方式对于 RNN 网络结构是一种可行方案，后续应该将此编码方式应用于先前的 CNN 结构，以作对比。看看同样的编码方式能够在先前的 CNN 网络结构中也获得较好的效果。 (之前字符级别的编码方式对于 RNN 网络结构，可能由于表示的矩阵过于稀疏，表现效果非常不好)
+
 ## Issues
 
 ### data representations
@@ -349,6 +364,26 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 
 对数量较多的类别使用 under sampling (欠采样)，以减少该类别训练数据的数量，而对数量少的类别样本使用 over sampling (过采样)，适当重复一些样本，以增加该类别的样本数量。
 
+- [x] Code implementation.
+
 ### Over-sampling / Under sampling processing order
 
 在当前实现方案中，对原始日志数据处理过后，如果产生多个 ``npz`` 文件，若不是使用所有的数据用于训练的话，当前的 over-sampling / under sampling 处理的时间点并不合理，我们的目的是对将要进行训练的数据进行类别的平衡，所有这种情况下，应该把 over-sampling / under-sampling 放到训练模型之前，读取 ``npz`` 数据之后。
+
+- [ ] Code implementation.
+
+### More efficient way to do convolution for the given sparse vectors (matrix).
+
+当前代码实现中，由于预处理后的数据是表现为一个稀疏的矩阵（向量）,在模型训练时，直接计算卷积比较耗费计算资源。
+
+TODO: 找寻更高效的稀疏矩阵卷积方式。
+
+- [ ] Code implementation.
+
+当前的处理方式是，一次性将所有待训练数据加载入内存中，然后进行卷积。
+
+改进方案：
+1. 分批次来加载待训练数据 ``generator`` 作为输入。
+2. 稀疏矩阵的真正卷积方式，似乎 keras 定义的模型并没有提供直接的 API 来使用。使用 tf 应该可行，需要后续进行尝试。
+
+直接使用 ``fitgenerator`` 来处理 scipy sparse matrices, 减少训练时占用的内存而已。 

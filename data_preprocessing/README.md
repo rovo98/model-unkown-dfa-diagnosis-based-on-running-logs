@@ -34,6 +34,11 @@
 
 ![compact-encoding-example-03](./images/logs_preprocessed_example.png)
 
+### for RNNs
+
+由于之前我们假定 DES 的事件集的可用字符为小写字母，所以，对于时间序列数据，之前非常稀疏编码方式作为 RNNs 输入就不太合适（局部太稀疏了），这也是为什么使用之前 character-level encoding 要用比较大的 kernel size 的原因。
+
+为此，我们采取相对简单的编码方式来处理，即 ASCII -> number。
 
 ### ISSUES
 

@@ -23,16 +23,16 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # enable memory growth for every GPU.
 # Using GPU devices to train the models is recommended.
 # uncomment the following several lines of code to disable forcing using GPU.
-physical_devices = tf.config.experimental.list_physical_devices('GPU')
-assert len(physical_devices) > 0, 'Not enough GPU hardware available'
-for gpu in physical_devices:
-    tf.config.experimental.set_memory_growth(gpu, True)
+# physical_devices = tf.config.experimental.list_physical_devices('GPU')
+# assert len(physical_devices) > 0, 'Not enough GPU hardware available'
+# for gpu in physical_devices:
+#     tf.config.experimental.set_memory_growth(gpu, True)
 
 # another approach from 'https://github.com/tensorflow/tensorflow/issues/25138#issuecomment-559339162'
-# config = ConfigProto()
-# config.gpu_options.per_process_gpu_memory_fraction = 0.2
-# config.gpu_options.allow_growth = True
-# session = InteractiveSession(config=config)
+config = ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.2
+config.gpu_options.allow_growth = True
+session = InteractiveSession(config=config)
 
 
 # noinspection DuplicatedCode
@@ -101,7 +101,7 @@ def train_model(epochs=10,
     #     location='../../dataset')
 
     # increasing log set size experiment dataset
-    num_of_faulty_type = 4
+    # num_of_faulty_type = 4
     # train_x, train_y, test_x, test_y = load_processed_dataset(
     #     '2020-03-23 13:16:49_czE3OmZzNDphczE0OmZlczI=_processed_logs_10k', num_of_faulty_type,
     #     location='../../dataset')
@@ -127,14 +127,19 @@ def train_model(epochs=10,
     # train_x, train_y, test_x, test_y = load_processed_dataset(
     #     '2020-03-23 13:21:04_czE3OmZzNDphczE0OmZlczI=_processed_logs_150L', num_of_faulty_type,
     #     location='../../dataset')
-    train_x, train_y, test_x, test_y = load_processed_dataset(
-        '2020-03-23 13:21:54_czE3OmZzNDphczE0OmZlczI=_processed_logs_200L', num_of_faulty_type,
-        location='../../dataset')
+    # train_x, train_y, test_x, test_y = load_processed_dataset(
+    #     '2020-03-23 13:21:54_czE3OmZzNDphczE0OmZlczI=_processed_logs_200L', num_of_faulty_type,
+    #     location='../../dataset')
 
+    # egr system dataset
+    num_of_faulty_type = 3
+    train_x, train_y, test_x, test_y = load_processed_dataset(
+        '2020-04-18 02:32:00_egr-system-logs.txt_processed_logs', num_of_faulty_type,
+        location='../../dataset')
     n_timesteps, n_features = train_x.shape[1], train_x.shape[2]
 
     # building the model.
-    model = build_fdconv1d_multichannel((n_timesteps, n_features), num_of_faulty_type)
+    model = build_fdconv1d_multichannel((n_timesteps, n_features), num_of_faulty_type, lr=5e-5)
 
     # print out the model summary
     if print_model_summary:
@@ -150,7 +155,7 @@ def train_model(epochs=10,
                             verbose=training_verbose, validation_split=validation_split)
         plot_training_history(history, 'fdconv1d-multichannels', history_fig_name, '../exper_imgs')
     elif using_validation:
-        es = EarlyStopping('val_categorical_accuracy', 1e-4, 3, 1, 'max')
+        es = EarlyStopping('val_loss', 1e-5, 5, 1, 'min')
         history = model.fit(x=[train_x, train_x, train_x], y=train_y, epochs=epochs, batch_size=batch_size,
                             verbose=training_verbose, validation_split=validation_split, callbacks=[es])
         # using generator for training big dataset or complex model
@@ -182,6 +187,6 @@ if __name__ == '__main__':
     train_model(50,
                 print_model_summary=True,
                 using_validation=True,
-                history_fig_name='fdconv1dmultichannel_czE3OmZzNDphczE0OmZlczI=_mfm-s-200l',
+                history_fig_name='fdconv1dmultichannel-egr',
                 save_model=True,
-                save_model_name='../trained_saved/fdconv1dmultichannel_czE3OmZzNDphczE0OmZlczI=_mfm-s-200l.h5')
+                save_model_name='../trained_saved/fdconv1dmultichannel-egr.h5')

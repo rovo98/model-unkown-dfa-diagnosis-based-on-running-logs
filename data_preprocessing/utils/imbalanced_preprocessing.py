@@ -23,6 +23,12 @@ def over_sampling(given_list, target_size):
     original_size = len(given_list)
     bias = target_size - original_size
 
+    # FIXME: temporary implementation
+    # avoiding extending to many samples
+    if bias > original_size * 0.5:
+        bias = bias // 2
+        print('>> updated: ', original_size, ' -> ', original_size + bias)
+
     result = copy.copy(given_list)
 
     if bias < original_size:
@@ -48,8 +54,15 @@ def under_sampling(given_list, target_size):
     :return: A result list contains elements after doing under sampling operation.
     """
     # basic validation is needed
-    if len(given_list) <= target_size:
+    original_size = len(given_list)
+    if original_size <= target_size:
         raise Exception('len of the given list is smaller than the target size!')
+
+    # FIXME: temporary implementation
+    # reducing more sampling when there is a extra big dataset.
+    if original_size - target_size > original_size * 0.5:
+        target_size = int(original_size * 0.5)
+        print('>> updated: ', original_size, ' -> ', target_size)
 
     result = []
     result.extend(random.sample(given_list, target_size))

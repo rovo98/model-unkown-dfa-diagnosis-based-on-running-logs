@@ -3,7 +3,7 @@
 # author: rovo98
 
 import os
-# import tensorflow as tf
+import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.utils import plot_model
@@ -112,7 +112,7 @@ def train_model(two_layers=False,
     #     location='../../dataset')
 
     # increasing log set size experiment dataset
-    num_of_faulty_type = 4
+    # num_of_faulty_type = 4
     # train_x, train_y, test_x, test_y = load_processed_dataset(
     #     '2020-03-23 13:16:49_czE3OmZzNDphczE0OmZlczI=_processed_logs_10k', num_of_faulty_type,
     #     location='../../dataset')
@@ -138,9 +138,20 @@ def train_model(two_layers=False,
     # train_x, train_y, test_x, test_y = load_processed_dataset(
     #     '2020-03-23 13:21:04_czE3OmZzNDphczE0OmZlczI=_processed_logs_150L', num_of_faulty_type,
     #     location='../../dataset')
+    # train_x, train_y, test_x, test_y = load_processed_dataset(
+    #     '2020-03-23 13:21:54_czE3OmZzNDphczE0OmZlczI=_processed_logs_200L', num_of_faulty_type,
+    #     location='../../dataset')
+
+    # egr system dataset
+    num_of_faulty_type = 3
     train_x, train_y, test_x, test_y = load_processed_dataset(
-        '2020-03-23 13:21:54_czE3OmZzNDphczE0OmZlczI=_processed_logs_200L', num_of_faulty_type,
+        '2020-04-18 02:32:00_egr-system-logs.txt_processed_logs', num_of_faulty_type,
         location='../../dataset')
+
+    # longer logs dataset of egr system.
+    # train_x, train_y, test_x, test_y = load_processed_dataset(
+    #     '2020-04-18 03:44:54_egr-system-logs.txt_processed_logs_l', num_of_faulty_type,
+    #     location='../../dataset')
 
     n_timesteps, n_features = train_x.shape[1], train_x.shape[2]
 
@@ -148,7 +159,7 @@ def train_model(two_layers=False,
     if two_layers:
         model = build_2l_conv1d((n_timesteps, n_features), num_of_faulty_type)
     else:
-        model = build_3l_conv1d((n_timesteps, n_features), num_of_faulty_type, kernel_size=31)
+        model = build_3l_conv1d((n_timesteps, n_features), num_of_faulty_type, kernel_size=31, lr=5e-5)
 
     # print out the model summary
     if print_model_summary:
@@ -169,7 +180,7 @@ def train_model(two_layers=False,
         plot_training_history(history, model_name, history_fig_name, '../exper_imgs')
     elif using_validation:
         # default early stopping is used
-        es = EarlyStopping('val_categorical_accuracy', 1e-4, 3, 1, 'max')
+        es = EarlyStopping('val_categorical_accuracy', 1e-5, 5, 1, 'max')
         history = model.fit(x=train_x, y=train_y, epochs=epochs, batch_size=batch_size, verbose=training_verbose,
                             validation_split=validation_split, callbacks=[es], use_multiprocessing=True)
         # huge dataset using nn_generator is better for training.
@@ -200,6 +211,6 @@ if __name__ == '__main__':
     train_model(epochs=50,
                 print_model_summary=True,
                 using_validation=True,
-                history_fig_name='fdConv1d-czE3OmZzNDphczE0OmZlczI=_mfm-s-200L',
+                history_fig_name='fdConv1d-egr',
                 save_model=True,
-                save_model_name='../trained_saved/fdConv1d-czE3OmZzNDphczE0OmZlczI=_mfm-s-200L.h5')
+                save_model_name='../trained_saved/fdConv1d-egr.h5')

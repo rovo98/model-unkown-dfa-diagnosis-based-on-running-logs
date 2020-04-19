@@ -236,8 +236,11 @@ if __name__ == '__main__':
     # load_data('2020-03-21 00:41:44_czE3OmZzNDphczE0OmZlczI=_running-logs_50L.txt')
     # load_data('2020-03-21 00:41:54_czE3OmZzNDphczE0OmZlczI=_running-logs_100L.txt')
     # load_data('2020-03-21 00:42:05_czE3OmZzNDphczE0OmZlczI=_running-logs_150L.txt')
-    load_data('2020-03-21 00:42:15_czE3OmZzNDphczE0OmZlczI=_running-logs_200L.txt')
+    # load_data('2020-03-21 00:42:15_czE3OmZzNDphczE0OmZlczI=_running-logs_200L.txt')
+
+    # extra egr system dataset
+    load_data('2020-04-17 23:27:36_egr-system-logs.txt')
     print('size of each log type: ', SIZE_OF_EACH_LOG_TYPE)
     print('Maximum column size: {}'.format(MAX_COLUMN_SIZE))
-    # encode_and_save_logs()
-    encode_and_save_logs("processed_logs_200L")
+    encode_and_save_logs()
+    # encode_and_save_logs("processed_logs_200L")

@@ -71,6 +71,7 @@ def load_data(filename, raw_data_path=config.DEFAULT_RAW_DATA_PATH):
             # RAW_RUNNING_LOGS.append([observation, faulty_mode])
             RAW_RUNNING_LOGS[int(faulty_mode)].append([observation, faulty_mode])
 
+        # FIXME: temporary added: reducing extra big class samples
         # Do over sampling & under sampling if it is necessary
         # ignoring the 0 items
         temp = list(filter(lambda x: x != 0, SIZE_OF_EACH_LOG_TYPE))
@@ -262,7 +263,7 @@ if __name__ == '__main__':
     # FIXME: Refactoring maybe needed, current configuring method is less elegant.
     # REMARKS: checking all configuration before launch the program.
     # NOTICE: Check OBSERVATION_LENGTH before launch the program.
-    config.OBSERVATION_LENGTH = 200
+    config.OBSERVATION_LENGTH = 50
     # load_data('2019-12-28 00:41:55_czc1OmZzNzphczE1OmZlczQ=_running-logs.txt')
     # load_data('2020-01-09 22:53:29_czE4OmZzNDphczE0OmZlczI=_running-logs.txt')
     # load_data('2020-01-09 22:56:13_czE4OmZzNDphczE2OmZlczI=_running-logs.txt')
@@ -296,11 +297,15 @@ if __name__ == '__main__':
     # load_data('2020-03-21 00:41:44_czE3OmZzNDphczE0OmZlczI=_running-logs_50L.txt')
     # load_data('2020-03-21 00:41:54_czE3OmZzNDphczE0OmZlczI=_running-logs_100L.txt')
     # load_data('2020-03-21 00:42:05_czE3OmZzNDphczE0OmZlczI=_running-logs_150L.txt')
-    load_data('2020-03-21 00:42:15_czE3OmZzNDphczE0OmZlczI=_running-logs_200L.txt')
+    # load_data('2020-03-21 00:42:15_czE3OmZzNDphczE0OmZlczI=_running-logs_200L.txt')
+
+    # extra egr system dataset
+    # load_data('2020-04-17 23:27:36_egr-system-logs.txt')
+    load_data('2020-04-18 03:43:16_egr-system-logs.txt')
     print('Filled configurations: ')
     print('max column size:', MAX_COLUMN_SIZE)
     print('size of each log type: ', SIZE_OF_EACH_LOG_TYPE)
-    # encode_and_save_logs()
-    encode_and_save_logs('processed_logs_200L')
+    encode_and_save_logs()
+    # encode_and_save_logs('processed_logs_200L')
     # save configuration of current processed running logs.
     # save_encoding_config()

@@ -111,6 +111,28 @@ class MyTestCase(unittest.TestCase):
         # plt.show()
         plt.savefig('exper_inc_log_length.png')
 
+    # noinspection PyMethodMayBeStatic
+    def test_plotting_egr_results(self):
+        import matplotlib.pyplot as plt
+        models = ['fdConv1d', 'fdConv1dMultiChannel', 'fdConv1dLSTM', 'fdTCN']
+        acc = [69.26, 70.13, 66.99, 69.47]
+
+        fig, ax = plt.subplots(1)
+
+        ax.scatter(models, acc)
+        ax.plot(models, acc, linestyle='-.')
+
+        ax.set_yticks(range(65, 72), 10)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.get_xaxis().tick_bottom()
+        ax.get_yaxis().tick_left()
+        ax.set_xlabel('Model Name')
+        ax.set_ylabel('Accuracy %')
+        fig.suptitle('Testing Accuracy on EGR System Dataset')
+        # ax.legend()
+        plt.savefig('testing-accuracy-on-egr-dataset.png')
+
 
 if __name__ == '__main__':
     unittest.main()

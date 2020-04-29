@@ -36,12 +36,19 @@ RNNs and LSTM may does better than CNNs for this classification task.
 > 折中方案：选择随机状态大小为 50 ～ 100， 随机生成的日志长度限制为 30 ～ 50， 则预处理编码后产生的矩阵表示为 [1, 50 x (observable_event_set_size + 1)\]
 > 产生的日志，经处理后，只剩 3 万多条，用于训练模型。训练时间大概为几分钟。
 
-![1dcovnet_training_example_01](images/1dconvnet_training_test_01.png)
-![1dcovnet_training_example_02](images/1dconvnet_training_test_02.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_01.png'/>
+</div>
+
+<div align="center">
+    <img src='./images/1dconvnet_training_test_02.png'/>
+</div>
 
 设置 ``epochs`` 为 100， 跑出来结果 (耗费时间 1 个多小时)
 
-![1dcovnet_training_example_03](images/1dconvnet_training_test_03_100-epochs.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_03_100-epochs.png'/>
+</div>
 
 **REMARKS: 当前编译模型时使用的 optimizer 是 adam (SGD 的一个泛化版)， 至于 batch_size 的选择，参考 arxiv 上两篇文献:**
 > 1. [Revisiting Small Batch Training for Deep Neural Networks](https://arxiv.org/abs/1804.07612)
@@ -62,21 +69,37 @@ RNNs and LSTM may does better than CNNs for this classification task.
 
 将 ``kernel_size`` 从 ``3`` 调整为 ``5``， ``pool_size`` 从 ``2`` 调整为 ``5``， 并在拟合模型时将输入的训练集划分一部分 (0.2) 作为 validation set (验证集)。
 
-![1dcovnet_training_example_04](images/1dconvnet_training_test_03_100-epochs_kernel_pool_size_changed_test_01_model.png)
-![1dcovnet_training_example_05](images/1dconvnet_training_test_03_100-epochs_kernel_pool_size_changed_test_01_training_result.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_03_100-epochs_kernel_pool_size_changed_test_01_model.png'/>
+</div>
+
+<div align="center">
+    <img src='./images/1dconvnet_training_test_03_100-epochs_kernel_pool_size_changed_test_01_training_result.png'/>
+</div>
 
 Using gpu to reduce time for training.
 
-![](./images/tensorflow_use_gpu_example.png)
-![1dcovnet_training_example_06](images/1dconvnet_training_test_03_100-epochs_kernel_pool_size_changed_test_01_training_result_using_gpu.png)
+<div align="center">
+    <img src='./images/tensorflow_use_gpu_example.png'/>
+</div>
+
+<div align="center">
+    <img src='./images/1dconvnet_training_test_03_100-epochs_kernel_pool_size_changed_test_01_training_result_using_gpu.png'/>
+</div>
 
 加载已保存的模型，并从原始日志集中选取若干日志进行测试，来看模型是否能够预测出正确的错误类型:
 
 选取的测试日志 (需要经过压缩编码后，再输入给模型):
-![](images/1dconvnet_training_test_03_100-epochs_prediction_test_01_test_logs.png)
+
+<div align="center">
+    <img src='./images/1dconvnet_training_test_03_100-epochs_prediction_test_01_test_logs.png'/>
+</div>
 
 预测情况如下：
-![](images/1dconvnet_training_test_03_100-epochs_prediction_test_01.png)
+
+<div align="center">
+    <img src='./images/1dconvnet_training_test_03_100-epochs_prediction_test_01.png'/>
+</div>
 
 > NOTICE: 可以看到，所有日志的预测结果都正确，但之前对模型的训练时的评估来看，我们选取的测试日志，很可能就是模型训练集中的样本。
 > 因为在数据预处理时，由于每种类别的日志数量不均衡，进行了 over-sampling 以及 under-sampling， 之后再进行打乱 shuffle, 所以从原始的日志上看，无法知道那些是没用于训练的日志。（除非一开始就将原始数据进行划分）
@@ -88,10 +111,14 @@ Using gpu to reduce time for training.
 尝试调整 ``filters`` 数量 (产生的 feature map 数量)，将网络中所有 hyperparameters 调整为原始默认参数，并将 ``epochs`` 下调至 ``10``，减小迭代次数（减少训练所需的时间）
 > 为了探索合适的 ``filters`` 大小，我们可以选取一个范围，小于初始值 ``64``的和大于初始值的。
 
-![](images/1dconvnet_training_test_04_filters_tuning_01.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_04_filters_tuning_01.png'/>
+</div>
 > 完成测试，耗费大概 3 个多小时。 图中，accuracy 准确率是 mean 均值，后面跟着的是 std (standard deviation) 标准差。
 
-![](images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters.png'/>
+</div>
 > 从上图可以看到，随着 ``filters`` feature map 的数量的增加，测试准确率中值（黄色的线）在不断上升，而在 ``64`` 之后反而开始下降，因此，或许 ``64`` 就是合适的值，它同时具备性能和稳定性。
 >
 > 这么看，模型刚开始选择的 ``64`` 就是比较合适的值。。。
@@ -101,10 +128,14 @@ Using gpu to reduce time for training.
 调整 ``kernel`` (卷积的核或 filter 过滤器大小)，核的大小控制每次读取序列时要考虑的时间步长 (time steps), 然后将时间步长投影 (project) 到 feature map (特征映射，此过程为卷积)。较大的核意味着对输入读取不那么严格。
 > 同样，我们可以选择一个范围的 ``kernel_size`` 来进行测试，其中包含初始建立网络选择的值 ``3``。
 
-![](./images/1dconvnet_training_test_05_kernel_size_01.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_01.png'/>
+</div>
 > 完成测试，所花费的时间还是 3 个多小时，测试集准确率是 mean 均值，后面是标准差。
 
-![](images/1dconvnet_training_test_05_kernel_size_01_exp_cnn_kernel.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_01_exp_cnn_kernel.png'/>
+</div>
 > 从该盒形图中可以明显看出，随着 ``kernel_size`` 的增加，测试准确率中值（黄色线）不断上升，且所有超参数取值对应的测试准确率稳定性非常好。
 >
 > 从测试来看，``kernel_size`` 取 ``11`` 具有非常不错的效果。
@@ -115,18 +146,26 @@ Using gpu to reduce time for training.
 
 使用比上面 ``11`` 更大的一个范围再次进行测试，结果如下:
 
-![](./images/1dconvnet_training_test_05_kernel_size_02.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_02.png'/>
+</div>
 > 耗时 3 个多小时，可以看到，测试精准率均值都非常高，且它们的稳定性都很好。
 
-![](./images/1dconvnet_training_test_05_kernel_size_02_exp_cnn_kernel.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_02_exp_cnn_kernel.png'/>
+</div>
 > 从该图中看的话，``kernel`` 取 ``19`` 是最好的。
 >
 > 因为，随着 kernel size 的增加，测试精准率中值（黄色线）不断上升，意味着，可能还有上升空间，因此可以再次设计实验了测试一组更大的 kernel size。
 
-![](./images/1dconvnet_training_test_05_kernel_size_03.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_03.png'/>
+</div>
 > 耗费 5 个多小时，随着 kernel size 的增大，训练时间变长。
 
-![](./images/1dconvnet_training_test_05_kernel_size_03_exp_cnn_kernel_03.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_03_exp_cnn_kernel_03.png'/>
+</div>
 > 从图中，可以看到，随着 kernel size 的增大，测试集精准率中值（黄色线）不断上升，虽然图中有些许离群点 (outlines)。
 >
 > 表现最好的是 ``27`` 大小 kernel size 的情况。
@@ -134,18 +173,26 @@ Using gpu to reduce time for training.
 > 从上图看，我们还可以再次设计一个更大的范围进行实验。。。
 
 
-![](./images/1dconvnet_training_test_05_kernel_size_04.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_04.png'/>
+</div>
 > 耗时将近 4 个小时。
 
-![](./images/1dconvnet_training_test_05_kernel_size_04_exp_cnn_kernel_04.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_04_exp_cnn_kernel_04.png'/>
+</div>
 > 相比于之前的值 ``27``, 除了 ``29`` 有两个表现不是很好的离群点外，其他的所有测试结果都比 ``27`` 的要好，这次测试中表现最好的是 ``37``。
 >
 > 这么看，我们还是可以再设计实验来探索更好的 kernel size 取值。
 
-![](./images/1dconvnet_training_test_05_kernel_size_05.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_05.png'/>
+</div>
 > 耗时 5 个多小时。
 
-![](./images/1dconvnet_training_test_05_kernel_size_05_exp_cnn_kernel_05.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_05_kernel_size_05_exp_cnn_kernel_05.png'/>
+</div>
 > 从实验数据上看的话，它们的表现效果都挺不错（但 50% 点，即黄色线从 41 开始逐渐下降了）
 >
 > 后续更大的取值范围实验就不做了，估计也不会再有很大的提升了。
@@ -160,17 +207,29 @@ Using gpu to reduce time for training.
 
 1. 针对与 kernel_size = ``31``, filters 测试范围 ``[8, 16, 32, 48]``
 
-![](./images/1dconvnet_training_test_04_filters_tuning_02.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_04_filters_tuning_02.png'/>
+</div>
 > 大概 4 个小时。
 
-![](./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters__kernel_size=31_01.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters__kernel_size=31_01.png'/>
+</div>
 > 可以看到，虽然相比 ``filters=64`` 的效果是差了点，但是明显可以了解到在 ``kernel_size=31`` 的情况下，就算 feature map 的数量叫少，模型还能保持不错的效果。**一个趋势是随着 filters 的增加，测试精准率中值 (黄色线)不断上升，这意味着提高 filters 取值是能够提高模型的性能的**
 >
 > 接下来，我们还可以试试如果提高 filters 的取值，模型能否获得更好的效果。
 
-![](./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters__kernel_size=31_02.png)
-![](./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters__kernel_size=31_02_1.png)
-![](./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters__kernel_size=31_02_2.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters__kernel_size=31_02.png'/>
+</div>
+
+<div align="center">
+    <img src='./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters__kernel_size=31_02_1.png'/>
+</div>
+
+<div align="center">
+    <img src='./images/1dconvnet_training_test_04_filters_tuning_exp_cnn_filters__kernel_size=31_02_2.png'/>
+</div>
 > 本来是用包含 ``256`` 的，但是前三个项跑，已经花了 9 个多小时，而根据 ``256`` 中一次 epoch 所需的时间来看，它估计最少需要 7 个小时。
 >
 > 从第一次完整训练效果来看，也估计不会太好的效果，所以不跑了。
@@ -184,8 +243,13 @@ Using gpu to reduce time for training.
 
 使用之前探索出来的模型结构，应用到日志压缩处理表示更长的情况 (之前是 50 编码后最长表示为 600, 下面使用的是 100, 编码后最长表示为 1400)。
 
-![](./images/1dconvnet_training_arch_fd1dconvnet_100-length-log_01.png)
-![](./images/1dconvnet_training_arch_fd1dconvnet_100-length-log_01_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fd1dconvnet_100-length-log_01.png'/>
+</div>
+
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fd1dconvnet_100-length-log_01_test.png'/>
+</div>
 > 模型仍能表示出不错的效果，需要注意的是虽然日志的表示长度不同，但它们的日志编码映射 (encoding mapping) 的最长表示是接近的。（因为它们 DFA 的 observable events set 的大小相近）
 >
 > 即它们的日志编码过后，使用的 vector 表示的稀疏程度相近。(通过之前的测试，如果遇到有更长 encoding mapping 的情况，可适当提高 kernel size 的大小，再对kernel size 进行范围取值测试，测试不同更大取值情况下的性能和稳定性)
@@ -195,8 +259,9 @@ Using gpu to reduce time for training.
 >
 > Code Refactoring is needed.
 
-![](./images/1dconvnet_training_arch_fd1dconvnet_100-length-log_01_multi_dataset_file.png)
-
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fd1dconvnet_100-length-log_01_multi_dataset_file.png'/>
+</div>
 
 #### Multi-Channel (head) CNN
 
@@ -206,22 +271,31 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 
 网络结构如下:
 
-![](./images/1dconvnet_training_multi_head_01_multi_channel_01.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_01_multi_channel_01.png'/>
+</div>
 > 三个 head 使用 filters 均为 ``64``, 使用的 kernel size 分别为 ``15``, ``17``, ``19``，且只有一层卷积层。pool_size 均为 ``2``， ``dropout`` 都是 ``0.5``。
 
 由于是一次随意的尝试，先不考虑训练出来的模型的稳定性，优先考虑性能，只做一次训练，结果如下:
-![](./images/1dconvnet_training_multi_head_01_multi_channel_01_test.png)
+
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_01_multi_channel_01_test.png'/>
+</div>
 > 训练 10 epochs 后，可以看到效果还行，估计还有很大提升空间，可以在对网络的结构进行调整。
 
 ##### 2. multi-channel with 2 conv layers
 
 调整上面的网络结构，使用两层卷积层，并调整三个不同 head 的 kernel size 为 ``17``, ``19``, ``21``。
 
-![](./images/1dconvnet_training_multi_head_02_multi_channel.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_02_multi_channel.png'/>
+</div>
 
 训练结果如下:
 
-![](./images/1dconvnet_training_multi_head_02_multi_channel_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_02_multi_channel_test.png'/>
+</div>
 > 效果其实和只使用一个 head (kernel size 为 17， 19， 或者 21) 的 1dconvnet 的效果表现其实差不多。
 >
 > REMARKS: 后续测试可以测试稳定性，以及对不同的 head 的 kernel size 再作出调整。
@@ -230,31 +304,59 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 
 下面给出的是，一些网络结构调整过后的测试一次测试结果（epochs 不定）
 
-![](./images/1dconvnet_training_multi_head_03_multi_channel_02.png)
-![](./images/1dconvnet_training_multi_head_03_multi_channel_02_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_03_multi_channel_02.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_03_multi_channel_02_test.png'/>
+</div>
 
-![](./images/1dconvnet_training_multi_head_04_multi_channel_03.png)
-![](./images/1dconvnet_training_multi_head_04_multi_channel_03_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_04_multi_channel_03.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_04_multi_channel_03_test.png'/>
+</div>
 
-![](./images/1dconvnet_training_multi_head_05_multi_channel_04.png)
-![](./images/1dconvnet_training_multi_head_05_multi_channel_04_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_05_multi_channel_04.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_05_multi_channel_04_test.png'/>
+</div>
 
-![](./images/1dconvnet_training_multi_head_06_multi_channel_05.png)
-![](./images/1dconvnet_training_multi_head_06_multi_channel_05_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_06_multi_channel_05.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_06_multi_channel_05_test.png'/>
+</div>
 
 选择上面探索出来的比较好的 filters 和 kernel size 的取值，进行组合。
 
-![](./images/1dconvnet_training_multi_head_07_multi_channel_06.png)
-![](./images/1dconvnet_training_multi_head_07_multi_channel_06_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_07_multi_channel_06.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_07_multi_channel_06_test.png'/>
+</div>
 > 效果是好了一点。
 
-![](./images/1dconvnet_training_multi_head_08_multi_channel_07.png)
-![](./images/1dconvnet_training_multi_head_08_multi_channel_07_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_08_multi_channel_07.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_08_multi_channel_07_test.png'/>
+</div>
 > 这次训练中选择的 kernel size 组合也是从上面实验获得的不错的取值，然后也对测试集进行了修改（增加到了 0.2 即 20%， 之前是 0.1）
 
 使用 validation set 并收集训练时的数据，绘制图形。
-![](./images/1dconvnet_training_multi_head_09_multi_channel_08_with_val_and_plot_statistics.png)
-![](./images/1dconvnet_training_multi_head_09_multi_channel_08_fd1dconvnet_multichannel_fig.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_09_multi_channel_08_with_val_and_plot_statistics.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_multi_head_09_multi_channel_08_fd1dconvnet_multichannel_fig.png'/>
+</div>
 > 表明该模型当前使用的超参数已经是挺不错的了。
 >
 > 可再设计一个 epochs 数量更大的实验来做对比 (看什么时候开始模型开始过拟合, over-fitting)。
@@ -267,15 +369,23 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 
 可先尝试只使用 LSTM 的方案。
 
-![](./images/1dconvnet_training_arch_fdlstmnet_01_try.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdlstmnet_01_try.png'/>
+</div>
 > 训练出来的模型效果非常差，根本没有拟合训练提供的数据, 且训练时间非常长, 1 epoch 需要十几分钟。
 > 后续需要对结构进行调整。
 
 尝试 CNN 中添加 LSTM 层的结构。
 
-![](./images/1dconvnet_training_arch_fdcnnlstmnet1.png)]
-![](./images/1dconvnet_training_arch_fdcnnlstmnet1_01.png)
-![](./images/1dconvnet_training_arch_fdcnnlstmnet1_02.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet1.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet1_01.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet1_02.png'/>
+</div>
 > 以上尝试均不行，模型拟合效果非常不好 20% 左右。
 >
 上面的这些结构，可能需要考虑调整结构后再进行测试。
@@ -290,8 +400,12 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 > TODO: The above papers needs to be read in more detail.
 
 
-![](./images/1dconvnet_training_arch_fdcnnlstmnet1_03.png)
-![](./images/1dconvnet_training_arch_fdcnnlstmnet1_03_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet1_03.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet1_03_test.png'/>
+</div>
 
 > 可以看到，从 第 6,7 epoch 开始，模型开始拟合训练数据。
 
@@ -303,19 +417,31 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 >
 > TODO: this paper should be read in more detail
 
-![](./images/1dconvnet_training_arch_fdcnnlstmnet2.png)
-![](./images/1dconvnet_training_arch_fdcnnlstmnet2_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet2.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet2_test.png'/>
+</div>
 
-![](./images/1dconvnet_training_arch_fdcnnlstmnet2_01.png)
-![](./images/1dconvnet_training_arch_fdcnnlstmnet2_01_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet2_01.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdcnnlstmnet2_01_test.png'/>
+</div>
 > 修改 kernel size 后进行的测试，仍有不错的效果。
 
 > 这是一个可行的方案，但从之前的测试来看，只使用 cnn 卷积层也是能够获得非常不错的效果的，所有很难判断此模型中右边 LSTM 层在模型中贡献度分配的问题上有起到多少作用。
 >
 > 只使用三层卷积层叠加（结构的左边部分）来构建模型，与它进行对比看看。
 
-![](./images/1dconvnet_training_arch_fd1dconvnet_m_01.png)
-![](./images/1dconvnet_training_arch_fd1dconvnet_m_01_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fd1dconvnet_m_01.png'/>
+</div>
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fd1dconvnet_m_01_test.png'/>
+</div>
 > 该结构表现出的效果与上面的双通道的效果很相近。
 
 > 该模型值得考虑。 有非常大的概率 LSTM 没有拟合训练数据。
@@ -330,7 +456,9 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 
 此时，我们转换成数字矩阵后的运行日志表示，它们的最大长度还是生成日志时的最大长度（不足长度的后面使用 0 进行填充）。在这种情况下，RNN 网络结构终于表示出非常不错的效果。
 
-![](./images/1dconvnet_training_arch_fdlstmnet_01_for_cnn_test.png)
+<div align="center">
+    <img src='./images/1dconvnet_training_arch_fdlstmnet_01_for_cnn_test.png'/>
+</div>
 
 且由于模型的参数数量少，模型的训练时间也相应地减少了。
 > 可见，此编码方式对于 RNN 网络结构是一种可行方案，后续应该将此编码方式应用于先前的 CNN 结构，以作对比。看看同样的编码方式能够在先前的 CNN 网络结构中也获得较好的效果。 (之前字符级别的编码方式对于 RNN 网络结构，可能由于表示的矩阵过于稀疏，表现效果非常不好)
@@ -364,7 +492,7 @@ multi-head cnn （选择不同 kernel size 的 conv 层做 feature map 的提取
 
 在当前实现方案中，对原始日志数据处理过后，如果产生多个 ``npz`` 文件，若不是使用所有的数据用于训练的话，当前的 over-sampling / under sampling 处理的时间点并不合理，我们的目的是对将要进行训练的数据进行类别的平衡，所有这种情况下，应该把 over-sampling / under-sampling 放到训练模型之前，读取 ``npz`` 数据之后。
 
-- [ ] Code implementation.
+- [x] Code implementation.
 
 ### More efficient way to do convolution for the given sparse vectors (matrix).
 
